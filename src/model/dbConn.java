@@ -110,14 +110,13 @@ public class dbConn {
     System.out.println("-----------------");
     System.out.println("执行结果如下所示:");
     System.out.println("-----------------");
-    System.out.println(" 用户ID" + "/t/t" + "淘宝ID" + "/t/t" + "用户名"+ "/t/t" + "密码");
     System.out.println("-----------------");
     try {
       while (rs.next()) {
-        System.out.println(rs.getInt("ju_userID") + "/t/t"
-          + rs.getString("taobaoID") + "/t/t"
-          + rs.getString("ju_userName")
-          + "/t/t"+ rs.getString("ju_userPWD"));
+        System.out.println(rs.getInt("id") + "/t/t"
+          + rs.getString("name") + "/t/t"
+          + rs.getString("mobile")
+          + "/t/t"+ rs.getString("email"));
       }
     } catch (SQLException e) {
       System.out.println("显示时数据库出错。");
