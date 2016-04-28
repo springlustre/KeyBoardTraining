@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+
 import javax.swing.*;
  
 public class login implements ActionListener {
@@ -104,12 +105,25 @@ public class login implements ActionListener {
 							jpf.setText(null);
 							jpf.requestFocus();// 光标回来
 						} else {
-							JOptionPane.showConfirmDialog(
-									jf, // 如果为null，此框架显示在中央，为jf则显示为jf的中央
-									"登录成功！\n" + "用户名 ： " + jtf.getText()
-											+ "\n密码 ： "
-											+ new String(jpf.getPassword()),
-									"登录结果", JOptionPane.DEFAULT_OPTION);
+						    main frame = new main();
+						    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+						    Dimension frameSize = frame.getSize();
+						    if (frameSize.height > screenSize.height) {
+						      frameSize.height = screenSize.height;
+						    }
+						    if (frameSize.width > screenSize.width) {
+						      frameSize.width = screenSize.width;
+						    }
+						    frame.setLocation((screenSize.width - frameSize.width) / 2,
+						      (screenSize.height - frameSize.height) / 2);
+						    frame.setVisible(true);
+						    jf.dispose();
+//							JOptionPane.showConfirmDialog(
+//									jf, // 如果为null，此框架显示在中央，为jf则显示为jf的中央
+//									"登录成功！\n" + "用户名 ： " + jtf.getText()
+//											+ "\n密码 ： "
+//											+ new String(jpf.getPassword()),
+//									"登录结果", JOptionPane.DEFAULT_OPTION);
 						}
 					}
 				} catch (Exception e1) {

@@ -88,7 +88,8 @@ public class main extends JFrame{
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           typingMain frame = new typingMain();
-          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          
+//          frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
           Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
           Dimension frameSize = frame.getSize();
           if (frameSize.height > screenSize.height) {

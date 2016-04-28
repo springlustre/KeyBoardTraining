@@ -84,9 +84,9 @@ public class toolUtil {
 			location[k][2]=c;
 		}
 
-		for(int i=0;i<location.length;i++){
-				System.out.println(location[i][0]+" "+location[i][1]+" "+location[i][2]);
-		}
+//		for(int i=0;i<location.length;i++){
+//				System.out.println(location[i][0]+" "+location[i][1]+" "+location[i][2]);
+//		}
 
 	}
 

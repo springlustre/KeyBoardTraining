@@ -54,10 +54,10 @@ public class imageMain extends JFrame implements Runnable {
      contentPane.setLayout(null);
      contentPane.setBackground(Color.WHITE);
      setSize(new Dimension(WIDTH, HEIGHT));
-     setTitle("语音训练");
+     setTitle("图像训练");
      /******************标题面板****************************/
      titlePane.setBounds(0, 2, WIDTH, (int) (HEIGHT * 0.15));
-     titlePane.setBackground(Color.blue);
+//     titlePane.setBackground(Color.blue);
      titlePane.setLayout(null);
      titlePane.setBorder(BorderFactory.createEtchedBorder());
      lbTitle.setText("图像训练");
@@ -74,12 +74,12 @@ public class imageMain extends JFrame implements Runnable {
 
      /******************图像面板****************************/
      imgPane.setBounds(new Rectangle(10, (int) (HEIGHT * 0.2), (int) (WIDTH * 0.65), (int) (HEIGHT * 0.8)));
-	 imgPane.setBackground(Color.cyan);
+//	 imgPane.setBackground(Color.cyan);
      imgPane.setLayout(null);
 
      /******************说明面板****************************/
      introPane.setBounds(new Rectangle((int) (WIDTH * 0.7), (int) (HEIGHT * 0.2), (int) (WIDTH * 0.3), (int) (HEIGHT * 0.7)));
-     introPane.setBackground(Color.green);
+//     introPane.setBackground(Color.green);
      introPane.setLayout(null);
      lbIntro.setBounds(new Rectangle(20, 30, 400, 200));
      lbIntro.setFont(new Font("宋体", Font.PLAIN, 36));
@@ -210,6 +210,7 @@ public class imageMain extends JFrame implements Runnable {
 	 */
 	public void removeBtnFromVector(JButton btn){
 		blocks.remove(btn);
+		System.out.println("blocksize"+blocks.size());
 		if(blocks.isEmpty()){
 			nextPlay();
 		}
