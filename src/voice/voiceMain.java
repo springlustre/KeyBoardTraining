@@ -43,6 +43,9 @@ public class voiceMain extends JFrame implements Runnable {
 	JLabel lbPlayImg = new JLabel();
 	JLabel playResult = new JLabel();
 	ImageIcon playIcon = new ImageIcon();
+	
+	JLabel curPlay=new JLabel();//当前局数
+	JLabel curNum =new JLabel();//当前个数
 	int curIndex = 1, rapidity = 80; // curIndex 当前进行的个数, rapidity 游标的位置
 	int rightNum = 0, wrongNum = 0;
 	int playNumArr[] = { 10, 20, 30 }; // 游戏每关的个数 可以自由添加.列 { 10 ,20 ,30 ,40,50}
@@ -101,13 +104,13 @@ public class voiceMain extends JFrame implements Runnable {
 		playResult.setBounds(new Rectangle(600, 2, 400, 58));
 
 		jPanelMain.setBorder(BorderFactory.createEtchedBorder());
-		jPanelMain.setBounds(new Rectangle(4, 55, 573, 450));
+		jPanelMain.setBounds(new Rectangle(20, 55, 500, 410));
 		jPanelMain.setLayout(null);
-		lbPlayImg.setBounds(new Rectangle(20, 20, 400, 400));
+		lbPlayImg.setBounds(new Rectangle(20, 5, 400, 400));
 		playIcon = // new ImageIcon(new ImageIcon("playicon.jpg").getImage()
 					// .getScaledInstance(500, 470, Image.SCALE_DEFAULT));
 		new ImageIcon(this.getClass().getClassLoader()
-				.getResource("voice/playicon.jpg"));
+				.getResource("voice/yuyinbofang1.png"));
 		lbPlayImg.setIcon(playIcon);
 		jPanelMain.add(lbPlayImg);
 
@@ -123,8 +126,6 @@ public class voiceMain extends JFrame implements Runnable {
 		btnStop.setBounds(new Rectangle(408, 542, 89, 31));
 		btnStop.setText("结束");
 		btnStop.addActionListener(new Frame1_btnStop_actionAdapter(this));
-		jLabel2.setText("第一关:100个");
-		jLabel2.setBounds(new Rectangle(414, 473, 171, 21));
 		contentPane.add(jPanelMain);
 		contentPane.add(labelTitle);
 		contentPane.add(lbCountDown);
@@ -133,7 +134,12 @@ public class voiceMain extends JFrame implements Runnable {
 		contentPane.add(playResult);
 		// contentPane.add(jSlider1);
 		// contentPane.add(jLabel1);
-		contentPane.add(jLabel2);
+		//当前个数和关卡数
+		curPlay.setText("aaa");
+		curPlay.setFont(new Font("宋体", Font.PLAIN, 34));
+		curPlay.setBounds(new Rectangle(500, 10, 200, 58));
+		contentPane.add(curPlay);
+		
 		this.addKeyListener(new MyListener());
 		btnStart.addKeyListener(new MyListener());
 		jSlider1.addKeyListener(new MyListener());
@@ -212,30 +218,32 @@ public class voiceMain extends JFrame implements Runnable {
 		}
 
 		if (finish.equals("true")) { // 判断是否是自然结束
-			if (rightNum / wrongNum >= 2) {
+//			if (rightNum / wrongNum >= 2) {
 				// JOptionPane.showMessageDialog(null, "恭喜你过关了");
-				playResult.setText("恭喜你过关了！");
+				playResult.setText("进入下一关！");
 
 				playCnt += 1; // 自动加1关
+				duringTime-=2;
 				if (playCnt < playNumArr.length) {
-					if (rapidity > 10) { // 当速度大于10的时候在-5提加速度.怕速度太快
-						rapidity -= 5; // 速度自动减10毫秒
-						jSlider1.setValue(rapidity); // 选择位置
-					}
+//					if (rapidity > 10) { // 当速度大于10的时候在-5提加速度.怕速度太快
+//						rapidity -= 5; // 速度自动减10毫秒
+//						jSlider1.setValue(rapidity); // 选择位置
+//					}
 					Thread t = new Thread(this);
 					t.start();
 				} else {
 					// JOptionPane.showMessageDialog(null, "牛B...你通关了..");
-					playResult.setText("请再接再厉");
+					playResult.setText("测试结束");
 					playCnt = 0;
 					curIndex = 0;
 				}
-			} else {
-				// JOptionPane.showMessageDialog(null, "请再接再励");
-				playResult.setText("请再接再厉");
-				playCnt = 0;
-				curIndex = 0;
-			}
+//			} 
+//			else {
+//				// JOptionPane.showMessageDialog(null, "请再接再励");
+//				playResult.setText("请再接再厉");
+//				playCnt = 0;
+//				curIndex = 0;
+//			}
 		} else {
 			playCnt = 0;
 			curIndex = 0;
@@ -254,6 +262,11 @@ public class voiceMain extends JFrame implements Runnable {
 			reset();
 			Thread t = new Thread(this);
 			t.start();
+		playIcon = // new ImageIcon(new ImageIcon("playicon.jpg").getImage()
+					// .getScaledInstance(500, 470, Image.SCALE_DEFAULT));
+		new ImageIcon(this.getClass().getClassLoader()
+				.getResource("voice/yuyinbofang.gif"));
+		lbPlayImg.setIcon(playIcon);
 		}
 	}
 
@@ -277,6 +290,11 @@ public class voiceMain extends JFrame implements Runnable {
 			answerRight = true; // 当前答对,tThread线程结束
 			keep = false; // 主线程结束一次循环
 			reset();
+		playIcon = // new ImageIcon(new ImageIcon("playicon.jpg").getImage()
+					// .getScaledInstance(500, 470, Image.SCALE_DEFAULT));
+		new ImageIcon(this.getClass().getClassLoader()
+				.getResource("voice/yuyinbofang1.png"));
+		lbPlayImg.setIcon(playIcon);
 		}
 	}
 
@@ -330,6 +348,7 @@ public class voiceMain extends JFrame implements Runnable {
 	class MyListener extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
 			String uu = e.getKeyChar() + "";
+			playResult.setText("");
 			for (int i = 0; i < number.size(); i++) {
 				Bean bean = ((Bean) number.get(i));
 				if (uu.equalsIgnoreCase(bean.getParameter())) {
