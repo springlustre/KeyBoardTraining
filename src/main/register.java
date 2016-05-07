@@ -5,57 +5,98 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
  
+
+
+
+
+
+
+import java.sql.SQLException;
+
 import javax.swing.*;
+
+import model.user;
  
 public class register implements ActionListener {
 	/**
-	 * @author Laycher {@link http://laycher.cn}
+	 * @author wangchunze
 	 */
+	private int WIDTH=900;
+	private int HEIGHT=600;
 	JFrame jf;
 	JTextField jtf;
 	JPasswordField jpf, jpf2;
- 
+	BackgroundPanel bgp;  
 	public register() {
 		jf = new JFrame("注册");
-		jf.setLayout(new GridLayout(6, 1));
+		jf.setLayout(null);
+		jf.setIconImage(new ImageIcon(getClass().
+				getClassLoader().getResource("main/zhucebeijing.png")).getImage()); 
 		jf.add(new JPanel());
-		JLabel jl1 = new JLabel(" 用  户  名：");
-		jtf = new JTextField(12);
+		bgp=new BackgroundPanel(new ImageIcon(getClass().
+				getClassLoader().getResource("main/zhucebeijing.png")).getImage());
+        bgp.setBounds(0,0,WIDTH,HEIGHT);  
+		jtf = new JTextField(18);
+		jtf.setPreferredSize(new Dimension(280, 30));
+		jtf.setFont(new Font("宋体", Font.PLAIN, 22));
 		JPanel jp1 = new JPanel();
-		jp1.add(jl1);
+		jp1.setBounds(340, 184, 300, 90);
+		jp1.setOpaque(false);
 		jp1.add(jtf);
 		jf.add(jp1);
  
-		JLabel jl2 = new JLabel(" 密        码：");
-		jpf = new JPasswordField(12);
+		jpf = new JPasswordField(18);
+		jpf.setPreferredSize(new Dimension(280, 30));
+		jpf.setFont(new Font("宋体", Font.PLAIN, 22));
 		JPanel jp2 = new JPanel();
-		jp2.add(jl2);
+		jp2.setBounds(340, 242, 300, 90);
+		jp2.setOpaque(false);
 		jp2.add(jpf);
 		jf.add(jp2);
  
-		JLabel jl3 = new JLabel("确认密码：");
-		jpf2 = new JPasswordField(12);
+		jpf2 = new JPasswordField(18);
+		jpf2.setPreferredSize(new Dimension(280, 30));
+		jpf2.setFont(new Font("宋体", Font.PLAIN, 22));
 		JPanel jp3 = new JPanel();
-		jp3.add(jl3);
+		jp3.setBounds(340, 298, 300, 90);
+		jp3.setOpaque(false);
 		jp3.add(jpf2);
 		jf.add(jp3);
  
 		JPanel jp4 = new JPanel();
+		jp4.setBounds(300, 350, 300, 90);
+		jp4.setOpaque(false);
 		JButton jb1 = new JButton("确认注册");
 		jb1.addActionListener(this);
 		JButton jb2 = new JButton("取消");
 		jb2.addActionListener(this);
+		JButton jb3 = new JButton("返回登录");
+		jb3.addActionListener(this);
 		jp4.add(jb1);
 		jp4.add(jb2);
+		jp4.add(jb3);
 		jf.add(jp4);
- 
+
+		jf.add(bgp);
+		jf.setSize(WIDTH, HEIGHT);
 		jf.setResizable(false);
 		jf.setVisible(true);
-		jf.setSize(300, 240);
-		jf.setLocation(300, 200);
+
+		// 设置显示位置
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension frameSize = jf.getSize();
+		if (frameSize.height > screenSize.height) {
+			frameSize.height = screenSize.height;
+		}
+		if (frameSize.width > screenSize.width) {
+			frameSize.width = screenSize.width;
+		}
+		jf.setLocation((screenSize.width - frameSize.width) / 2,
+				(screenSize.height - frameSize.height) / 2);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
  
@@ -96,59 +137,48 @@ public class register implements ActionListener {
 				jf.pack();
 				jf.setLocation(400, 300);
 			} else {
-				String s = jtf.getText() + "&&" + new String(jpf.getPassword())
-						+ "\r\n";// '\r'+'\n'也可以，"\r"+"\n"也可以
-				String name = jtf.getText() + "&&";
-				File file = new File("reg.txt");
-				try {
-					file.createNewFile(); // 当且仅当不存在具有此抽象路径名指定名称的文件时，不可分地创建一个新的空文件。
-				} catch (IOException e2) {
-					e2.printStackTrace();
-				}
-				try { // 读文件的注册信息
-					FileInputStream fis = new FileInputStream(file);
-					String s1 = "";
-					byte[] b = new byte[1024];
-					while (true) {
-						int i = fis.read(b);
-						if (i == -1)
-							break;
-						s1 = s1 + new String(b, 0, i);
+				String password =new String(jpf.getPassword());
+				String password2=new String(jpf2.getPassword());
+				String name = jtf.getText();
+				if(!password.equals(password2)){
+					JOptionPane.showConfirmDialog(
+							jf, // 如果为null，此框架显示在中央，为jf则显示为jf的中央
+							"两次密码不一样!\n请重新输入密码！", "密码不一样",
+							JOptionPane.CLOSED_OPTION);
+					jpf.setText(null);
+					jpf2.setText(null);
+					jpf.requestFocus();// 光标回来
+				}else{
+					int registerResult = 0;
+					try {
+						registerResult = user.register(name,password);
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
-					fis.close();// 关闭流
-					int i = s1.indexOf(name);
-					if (i == -1) { // 如果文档中没有，要注册到文件中
-						if (new String(jpf.getPassword()).equals(new String(
-								jpf2.getPassword()))) {
-							try {
-								FileOutputStream fos = new FileOutputStream(
-										file, true);
-								// true就是追加，false就是替换。
-								fos.write(s.getBytes());
-								fos.close();
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-							int a = JOptionPane.showConfirmDialog(jf, "注册成功！\n"
-									+ "用户名 ： " + jtf.getText() + "\n密码 ： "
-									+ new String(jpf.getPassword())
-									+ "\n点确定转入登录界面", "注册结果",
-									JOptionPane.OK_CANCEL_OPTION);
-							if (a == 0) {
-								jf.dispose();
-								new login();
-							}
-						} else {
-							JOptionPane.showConfirmDialog(
-									jf, // 如果为null，此框架显示在中央，为jf则显示为jf的中央
-									"两次密码不一样!\n请重新输入密码！", "密码不一样",
-									JOptionPane.CLOSED_OPTION);
-							jpf.setText(null);
-							jpf2.setText(null);
-							jpf.requestFocus();// 光标回来
+					if(registerResult==1){
+						int a = JOptionPane.showConfirmDialog(jf, "注册成功！\n"
+								+ "用户名 ： " + jtf.getText() + "\n密码 ： "
+								+ new String(jpf.getPassword())
+								+ "\n点确定转入登录界面", "注册结果",
+								JOptionPane.OK_CANCEL_OPTION);
+						if (a == 0) {
+							jf.dispose();
+							new login();
 						}
-					} else {
- 
+					}else if(registerResult==0){
+						JOptionPane.showConfirmDialog(
+								jf, // 如果为null，此框架显示在中央，为jf则显示为jf的中央
+								"注册失败!\n请稍后再试！", "错误",
+								JOptionPane.CLOSED_OPTION);
+						jtf.setText(null);
+						jpf.setText(null);
+						jpf2.setText(null);
+						jtf.requestFocus();// 光标回来
+					}else if(registerResult==2){
 						JOptionPane.showConfirmDialog(
 								jf, // 如果为null，此框架显示在中央，为jf则显示为jf的中央
 								"用户名已经被注册!\n请换一个用户名重新注册！", "错误",
@@ -158,13 +188,13 @@ public class register implements ActionListener {
 						jpf2.setText(null);
 						jtf.requestFocus();// 光标回来
 					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
+				}			
 			}
-		} else if (comm.equals("取消")) {
+		}else if(comm.equals("返回登录")){
+			jf.dispose();
+			new login();
+		}else{
 			System.exit(0);
 		}
- 
 	}
 }
