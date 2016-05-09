@@ -8,6 +8,8 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -69,11 +71,15 @@ public class voiceMain extends JFrame implements Runnable {
 	char list[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
 			'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
 			'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9' }; // 随机出现的数字
-																// 可以自由添加
+	
 	Vector number = new Vector();
 	String finish = "true";
 	AudioClip Musci_press, Music_fail, Music_success;
 
+	/**存储操作数据*/
+	//局数，次数，对错，原因(1错误 2超时)，操作次数,时间
+	Vector data=new Vector();
+	int costTime=0;
 	/**
 	 * 构造方法，加载声音文件，调用界面初始化函数
 	 */
@@ -346,6 +352,7 @@ public class voiceMain extends JFrame implements Runnable {
 					playResult.setText("测试结束");
 					playCnt = 0;
 					curIndex = 0;
+					result2File();
 				}
 //			} 
 //			else {
@@ -382,6 +389,7 @@ public class voiceMain extends JFrame implements Runnable {
 		lbPlayImg.setIcon(playIcon);
         curNum.setText("1/10");
 		curPlay.setText("第1局");
+		data.removeAllElements();
 		}
 	}
 
@@ -411,6 +419,7 @@ public class voiceMain extends JFrame implements Runnable {
 			answerRight = true; // 当前答对,tThread线程结束
 			keep = false; // 主线程结束一次循环
 			reset();
+			result2File();//保存到文件
 		playIcon = // new ImageIcon(new ImageIcon("playicon.jpg").getImage()
 					// .getScaledInstance(500, 470, Image.SCALE_DEFAULT));
 		new ImageIcon(this.getClass().getClassLoader()
@@ -434,6 +443,7 @@ public class voiceMain extends JFrame implements Runnable {
 			show.setText(parameter);
 			clearHistoryInput(); //清楚历史输入显示
 			int countDown = duringTime;
+			costTime=1;
 			while (keep) {
 				lbCountDown.setText(countDown+"秒");
 				// ---------------------数字显示--------------------
@@ -444,7 +454,7 @@ public class voiceMain extends JFrame implements Runnable {
 					e.printStackTrace();
 				}
 				countDown = countDown - 1; // 倒计时减一
-
+				costTime=duringTime-countDown;
 				if (countDown < 0 || answerRight) { // 等待作答时间结束
 					keep = false;
 					answerRight = false;
@@ -455,6 +465,7 @@ public class voiceMain extends JFrame implements Runnable {
 							bn.getShow().setVisible(false);
 							jLabel2.setText("正确:" + rightNum + "个,错误:"
 									+ wrongNum + "个");
+							data.add(new int[]{playCnt,curIndex,0,2,vectorInput.size(),duringTime});
 							number.removeElementAt(i);
 							Music_fail.play();
 							break;
@@ -484,9 +495,11 @@ public class voiceMain extends JFrame implements Runnable {
 					number.removeElementAt(i);
 					bean.getShow().setVisible(false);
 					lbResult.setText("正确");
-					vectorInput.removeAllElements();
 					jLabel2.setText("正确:" + rightNum + "个,错误:" + wrongNum + "个");
 					Music_success.play();
+					//保存数据
+					data.add(new int[]{playCnt,curIndex,1,0,vectorInput.size(),costTime});
+					vectorInput.removeAllElements();
 					break;
 				}else{
 					if(vectorInput.size()>=4){
@@ -498,6 +511,8 @@ public class voiceMain extends JFrame implements Runnable {
 						bean.getShow().setVisible(false);
 						vectorInput.removeAllElements();
 						jLabel2.setText("正确:" + rightNum + "个,错误:" + wrongNum + "个");
+						//保存数据
+						data.add(new int[]{playCnt,curIndex,0,1,4,duringTime});
 					}
 				}
 			}		
@@ -507,7 +522,7 @@ public class voiceMain extends JFrame implements Runnable {
 	}
 	
 	public void saveHistoryInput(){
-		System.out.println(vectorInput.size());
+//		System.out.println(vectorInput.size());
 		ArrayList al=new ArrayList();
 		al.add(input1);
 		al.add(input2);
@@ -526,6 +541,34 @@ public class voiceMain extends JFrame implements Runnable {
 		input4.setText("");
 	}
 
+	public void result2File(){
+		String saveData=System.currentTimeMillis()+"\n";
+		for(int i=0;i<data.size();i++){
+			int a[]=(int[])data.get(i);
+			for(int k=0;k<a.length;k++){
+				saveData+=a[k]+",";
+			}
+			saveData+="\n";
+		}
+		saveData+="\n";
+		FileWriter writer = null;  
+        try {     
+            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件     
+            writer = new FileWriter("src/voice/result.txt", true);     
+            writer.write(saveData);       
+        } catch (IOException e) {     
+            e.printStackTrace();     
+        } finally {     
+            try {     
+                if(writer != null){  
+                    writer.close();     
+                }  
+            } catch (IOException e) {     
+                e.printStackTrace();     
+            }     
+        }   
+	}
+	
 	/**
 	 * main 函数
 	 */
