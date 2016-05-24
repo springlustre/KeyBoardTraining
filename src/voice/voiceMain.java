@@ -61,7 +61,7 @@ public class voiceMain extends JFrame implements Runnable {
 	JLabel curPlay=new JLabel();//当前局数
 	JLabel curNum =new JLabel();//当前个数
 	
-	int curIndex = 1, rapidity = 80; // curIndex 当前进行的个数, rapidity 游标的位置
+	int curIndex = 0, rapidity = 80; // curIndex 当前进行的个数, rapidity 游标的位置
 	int rightNum = 0, wrongNum = 0;
 	int playNumArr[] = { 10, 10, 10 }; // 游戏每关的个数 可以自由添加.列 { 10 ,20 ,30 ,40,50}
 	int playCnt = 0; // 记录关数
@@ -198,7 +198,7 @@ public class voiceMain extends JFrame implements Runnable {
 		
 		/***********结果显示部分***********/
 		panelResult.setLayout(null);
-		panelResult.setBounds(new Rectangle(550, 60, 530, 400));
+		panelResult.setBounds(new Rectangle(530, 40, 530, 400));
 //		panelResult.setBackground(Color.cyan);
 		JLabel curPlayIcon=new JLabel(new ImageIcon(this.getClass().getClassLoader()
 				.getResource("voice/curPlayIcon.png")));
@@ -353,6 +353,7 @@ public class voiceMain extends JFrame implements Runnable {
 					playCnt = 0;
 					curIndex = 0;
 					result2File();
+					model.dataDao.saveVoiceData2DB(data);
 				}
 //			} 
 //			else {
@@ -420,6 +421,8 @@ public class voiceMain extends JFrame implements Runnable {
 			keep = false; // 主线程结束一次循环
 			reset();
 			result2File();//保存到文件
+			model.dataDao.saveVoiceData2DB(data);
+			System.out.println("测试结束");
 		playIcon = // new ImageIcon(new ImageIcon("playicon.jpg").getImage()
 					// .getScaledInstance(500, 470, Image.SCALE_DEFAULT));
 		new ImageIcon(this.getClass().getClassLoader()
@@ -465,6 +468,7 @@ public class voiceMain extends JFrame implements Runnable {
 							bn.getShow().setVisible(false);
 							jLabel2.setText("正确:" + rightNum + "个,错误:"
 									+ wrongNum + "个");
+							if(curIndex<playNumArr[playCnt])
 							data.add(new int[]{playCnt,curIndex,0,2,vectorInput.size(),duringTime});
 							number.removeElementAt(i);
 							Music_fail.play();
@@ -522,7 +526,6 @@ public class voiceMain extends JFrame implements Runnable {
 	}
 	
 	public void saveHistoryInput(){
-//		System.out.println(vectorInput.size());
 		ArrayList al=new ArrayList();
 		al.add(input1);
 		al.add(input2);

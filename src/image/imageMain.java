@@ -4,11 +4,14 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import model.dataDao;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,25 +26,27 @@ public class imageMain extends JFrame implements Runnable {
 	JPanel imgPane = new JPanel(); //显示图像面板
 	JPanel titlePane = new JPanel(); //标题面板
 	JPanel introPane = new JPanel(); //介绍信息面板
-
+	BackgroundPanel bgp; 
 	JLabel lbTitle=new JLabel();//标题标签
 	JLabel lbName=new JLabel();//名称标签
 	JLabel lbIntro=new JLabel();//说明标签
 	JLabel lbIntro2=new JLabel();//说明标签
 	JLabel lbResult=new JLabel();//操作结果标签
 	JLabel lbNowTime=new JLabel();//显示当前进行时间的标签
-
+    JLabel lbImgBg=new JLabel();
+	JLabel lbTrueOrFalse=new JLabel("正确");
+    
 	JButton btnStart=new JButton();//开始按钮
 	JButton btnStop=new JButton();//结束按钮
 	JButton btnRestart=new JButton();//重新开始按钮
-
+    
 	Vector blocks = new Vector(); //存储方块♦
 //	HashMap result = new HashMap();
 //	result.put(1,2);
     HashMap<String ,Integer> result = new HashMap<String,Integer>();
     int timeCnt=0;
 	boolean stop=false;
-
+	int trueOrFalse=0;
 	/**
 	 * 界面初始化
 	 * @throws Exception
@@ -59,7 +64,6 @@ public class imageMain extends JFrame implements Runnable {
      titlePane.setBounds(0, 2, WIDTH, (int) (HEIGHT * 0.15));
 //     titlePane.setBackground(Color.blue);
      titlePane.setLayout(null);
-     titlePane.setBorder(BorderFactory.createEtchedBorder());
      lbTitle.setText("图像训练");
      lbTitle.setBounds(new Rectangle(2, 30, 400, 40));
      lbTitle.setFont(new Font("宋体", Font.PLAIN, 34));
@@ -73,10 +77,17 @@ public class imageMain extends JFrame implements Runnable {
 
 
      /******************图像面板****************************/
-     imgPane.setBounds(new Rectangle(10, (int) (HEIGHT * 0.2), (int) (WIDTH * 0.65), (int) (HEIGHT * 0.8)));
+     imgPane.setBounds(new Rectangle(10, (int) (HEIGHT * 0.2), (int) (WIDTH * 0.65), (int) (HEIGHT * 0.7)));
 //	 imgPane.setBackground(Color.cyan);
      imgPane.setLayout(null);
-
+     imgPane.setOpaque(false);
+     lbImgBg.setBounds(new Rectangle(10, (int) (HEIGHT * 0.2), (int) (WIDTH * 0.65), (int) (HEIGHT * 0.7)));
+     ImageIcon icon=new ImageIcon(this.getClass().getClassLoader()
+				.getResource("image/writebg.jpg"));
+     lbImgBg.setIcon(icon);
+     lbImgBg.setOpaque(false);
+    
+     
      /******************说明面板****************************/
      introPane.setBounds(new Rectangle((int) (WIDTH * 0.7), (int) (HEIGHT * 0.2), (int) (WIDTH * 0.3), (int) (HEIGHT * 0.7)));
 //     introPane.setBackground(Color.green);
@@ -90,9 +101,12 @@ public class imageMain extends JFrame implements Runnable {
 			 + "绿色方格)<br>"
 			 + "</html>");
      introPane.add(lbIntro);
-     lbIntro2.setBounds(new Rectangle(20, 280, 400, 50));
+     lbIntro2.setBounds(new Rectangle(20, 260, 400, 50));
      lbIntro2.setFont(new Font("宋体", Font.PLAIN, 33));
      lbIntro2.setText("精准定位及运动功能");
+     lbTrueOrFalse.setBounds(new Rectangle(120, 340, 400, 50));
+     lbTrueOrFalse.setFont(new Font("宋体",Font.PLAIN, 28));
+     introPane.add(lbTrueOrFalse);
      introPane.add(lbIntro2);
 
      btnStart.setBounds(new Rectangle(20, 400, 110, 40));
@@ -110,10 +124,11 @@ public class imageMain extends JFrame implements Runnable {
 		btnStop.addActionListener(new btnStopActionAdapter(this));
 		introPane.add(btnStop);
 
-
      contentPane.add(titlePane);
      contentPane.add(imgPane);
      contentPane.add(introPane);
+     contentPane.add(lbImgBg);
+    
 	}
 
 	/**
@@ -136,9 +151,11 @@ public class imageMain extends JFrame implements Runnable {
 						result.put("right", right + 1);
 						bn.setVisible(false);
 						removeBtnFromVector(bn);
+						trueOrFalse=1;
 					}else{
 						int wrong=result.get("wrong");
 						result.put("wrong", wrong + 1);
+						trueOrFalse=0;
 					}
 					updateResult();
 					clickFlag = true;
@@ -169,9 +186,11 @@ public class imageMain extends JFrame implements Runnable {
 								removeBtnFromVector(bn);
 								int right=result.get("right");
 								result.put("right", right + 1);
+								trueOrFalse=1;
 							}else{
 								int wrong=result.get("wrong");
 								result.put("wrong", wrong + 1);
+								trueOrFalse=0;
 							}
 							updateResult();
 							clickFlag = true;
@@ -194,9 +213,11 @@ public class imageMain extends JFrame implements Runnable {
 					removeBtnFromVector(bn);
 					int right=result.get("right");
 					result.put("right", right + 1);
+					trueOrFalse=1;
 				}else{
 					int wrong=result.get("wrong");
 					result.put("wrong", wrong + 1);
+					trueOrFalse=0;
 				}
 				updateResult();
 			}
@@ -210,7 +231,6 @@ public class imageMain extends JFrame implements Runnable {
 	 */
 	public void removeBtnFromVector(JButton btn){
 		blocks.remove(btn);
-		System.out.println("blocksize"+blocks.size());
 		if(blocks.isEmpty()){
 			nextPlay();
 		}
@@ -238,8 +258,7 @@ public class imageMain extends JFrame implements Runnable {
 	public void addImgBlock(JPanel p,int n){
 		int[][] location=toolUtil.getRandomLocation(p.getWidth(),p.getHeight(),60,40,n);//获取坐标
 		for(int i=0;i<n;i++) {
-			JButton btnBlock = new JButton(i+"");
-			System.out.println(i+" "+location[i][0]+" "+location[i][1]);
+			JButton btnBlock = new JButton("");
 			blocks.add(btnBlock);
 			btnBlock.addMouseListener(new MyMouseListener());
 			btnBlock.setBounds(location[i][0], location[i][1],60,50);
@@ -257,12 +276,45 @@ public class imageMain extends JFrame implements Runnable {
 
 
 	public void updateResult(){
+		if(trueOrFalse>0)
+			lbTrueOrFalse.setText("正确");
+		else 
+			lbTrueOrFalse.setText("错误");
+		
 		int total=result.get("total");
 		int right=result.get("right");
 		int wrong=result.get("wrong");
 		lbResult.setText("总共:"+total+" "+"正确:"+right+" "+"错误:"+wrong);
 	}
-
+	
+	public void save2File(){
+		int total=result.get("total");
+		int right=result.get("right");
+		int wrong=result.get("wrong");
+		Long timeStamp=System.currentTimeMillis();
+		String saveData=timeStamp+","+total+","+right+","+wrong+","+timeCnt+"\n";
+		saveData+="\n";
+		FileWriter writer = null;  
+        try {     
+            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件     
+            writer = new FileWriter("src/image/result.txt", true);     
+            writer.write(saveData);       
+        } catch (IOException e) {     
+            e.printStackTrace();     
+        } finally {     
+            try {     
+                if(writer != null){  
+                    writer.close();     
+                }  
+            } catch (IOException e) {     
+                e.printStackTrace();     
+            }     
+        } 
+        
+        dataDao.saveImage2DB(timeStamp,total,right,wrong,timeCnt);
+	}
+	
+	
 
 	@Override
 	public void run() {
@@ -320,6 +372,7 @@ public class imageMain extends JFrame implements Runnable {
 			btn.setVisible(false);
 		}
 		stop=true;
+		save2File();
 		btnStart.setVisible(true);
 		btnRestart.setVisible(false);
 	}
@@ -332,6 +385,7 @@ public class imageMain extends JFrame implements Runnable {
 			JButton btn=(JButton)blocks.get(i);
 			btn.setVisible(false);
 		}
+		save2File();
 		timeCnt=0;
 		Thread t = new Thread(this);
 		t.start();
@@ -411,3 +465,20 @@ class btnRestartActionAdapter implements ActionListener{
 		adapter.btnRestart();
 	}
 }
+
+class BackgroundPanel extends JPanel  
+{  
+    Image im;  
+    public BackgroundPanel(Image im)  
+    {  
+        this.im=im;  
+        this.setOpaque(true);  
+    }  
+    //Draw the back ground.  
+    public void paintComponent(Graphics g)  
+    {  
+        super.paintComponents(g);  
+        g.drawImage(im,0,0,this.getWidth(),this.getHeight(),this);  
+    }  
+}  
+  

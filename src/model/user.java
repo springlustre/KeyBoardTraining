@@ -1,13 +1,46 @@
 package model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 public class user {
+	Long id=0l;
+	String name="";
+	String mobile="";
+	String email="";
+	String password="";
+	String sex="";
+	int age=0;
+	String address="";
+	
+	user() throws IOException{
+		FileReader fr=new FileReader("user.txt");
+        BufferedReader br=new BufferedReader(fr);
+        String line="";
+        String[] arrs=null;
+        line=br.readLine();
+    	arrs=line.split("\u0001");
+    	id=Long.parseLong(arrs[0]);
+    	name=arrs[1];
+        mobile=arrs[2];
+    	email=arrs[3];
+    	password=arrs[4];
+    	sex=arrs[5];
+    	age=Integer.parseInt(arrs[6]);
+    	address=arrs.length==8?arrs[7]:"";
+        br.close();
+        fr.close();
+	}
+	
+
+	
 	
 	public static String login(String username,String password) throws SQLException, FileNotFoundException{
 		dbConn h = new dbConn();
@@ -84,10 +117,15 @@ public class user {
 	}
 	
 	
-	public static void main(String[] args) throws SQLException, FileNotFoundException {
+	
+	public static void main(String[] args) throws SQLException, IOException {
 		// TODO Auto-generated method stub
 //		System.out.println(login("王春泽","mmaassdd"));
-		System.out.println(register("13520358713","aaa"));
+//		System.out.println(register("13520358713","aaa"));
+		user a=new user();
+		System.out.println(a.id+a.name+a.address);
 	}
 
 }
+
+

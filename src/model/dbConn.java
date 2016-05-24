@@ -18,8 +18,8 @@ public class dbConn {
   // connect to MySQL
   void connSQL() {
     String url = "jdbc:mysql://139.129.25.229:3306/training?characterEncoding=UTF-8";
-    String username = "root";
-    String password = "wang897618476A"; // 加载驱动程序以连接数据库
+    String username = "training";
+    String password = "training"; // 加载驱动程序以连接数据库
     try {
       Class.forName("com.mysql.jdbc.Driver");
       conn = DriverManager.getConnection(url,username, password);

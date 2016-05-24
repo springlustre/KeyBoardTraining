@@ -3,6 +3,7 @@ package typing;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.event.ActionEvent;
@@ -10,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 import java.awt.Color;
@@ -18,6 +21,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,6 +29,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.UIManager;
+
+
+
+
+
+import model.dataDao;
 
 import java.awt.Font;
 
@@ -48,7 +58,7 @@ public class typingMain extends JFrame implements Runnable {
   JLabel jLabel2 = new JLabel();
   int curIndex = 1, rapidity = 80; // curIndex 当前进行的个数, rapidity 游标的位置
   int rightNum = 0, wrongNum = 0;
-  int playNumArr[] = { 10 ,20 ,30 };     //游戏每关的个数 可以自由添加.列 { 10 ,20 ,30 ,40,50}
+  int playNumArr[] = {10,10,10,10};     //游戏每关的个数 可以自由添加.列 { 10 ,20 ,30 ,40,50}
   int playCnt = 0;      //记录关数
   int duringTime=10; //切换字母的间隔时间
   boolean answerRight=false; //是否正确作答
@@ -65,8 +75,13 @@ public class typingMain extends JFrame implements Runnable {
   String finish = "true";
   AudioClip Musci_press, Music_fail, Music_success;
 //  JLabel labelTitle=new JLabel("a"); //标题
-
-
+  //局数，次数，对错，原因(1错误 2超时),时间
+  Vector data=new Vector();
+	int costTime=0;
+//	Object[] possibleValues = { "First", "Second", "Third" };   
+//	Object selectedValue = JOptionPane.showInputDialog(null,  "Choose one", "Input",    
+//	    JOptionPane.INFORMATION_MESSAGE, null, 
+//	    possibleValues, possibleValues[0]);
   /**
    * 构造方法，加载声音文件，调用界面初始化函数
    */
@@ -97,10 +112,10 @@ public class typingMain extends JFrame implements Runnable {
     contentPane = (JPanel) getContentPane();
     contentPane.setLayout(null);
     setSize(new Dimension(1200, 700));
-    setTitle("typing training");
+    setTitle("图像练习");
     labelTitle.setFont(new Font("宋体", Font.PLAIN, 34));
     labelTitle.setBounds(new Rectangle(2, 2, 200, 58));
-    labelTitle.setText("keyboardTraining");
+    labelTitle.setText("键盘操作");
 
     lbCountDown.setFont(new Font("宋体", Font.PLAIN, 34));
     lbCountDown.setBounds(new Rectangle(300, 2, 200, 58));
@@ -108,7 +123,7 @@ public class typingMain extends JFrame implements Runnable {
 
 
     jPanelMain.setBorder(BorderFactory.createEtchedBorder());
-    jPanelMain.setBounds(new Rectangle(4, 60, 950, 600));
+    jPanelMain.setBounds(new Rectangle(4, 150, 950, 600));
     jPanelMain.setLayout(null);
 //    jPanelMain.setBackground(Color.BLUE);
     for(int i=0;i<list.length;i++){
@@ -162,8 +177,9 @@ public class typingMain extends JFrame implements Runnable {
     btnStop.setBounds(new Rectangle(1050, 42, 89, 31));
     btnStop.setText("结束");
     btnStop.addActionListener(new Frame1_btnStop_actionAdapter(this));
-    jLabel2.setText("第一关:100个");
-    jLabel2.setBounds(new Rectangle(414, 473, 171, 21));
+    jLabel2.setText("第一关:10个");
+    jLabel2.setFont(new Font("宋体", Font.PLAIN, 20));
+    jLabel2.setBounds(new Rectangle(414, 110, 271, 21));
     contentPane.add(jPanelMain);
     contentPane.add(labelTitle);
     contentPane.add(lbCountDown);
@@ -184,74 +200,57 @@ public class typingMain extends JFrame implements Runnable {
 
 
   public void run() {
-    number.clear();
-    rightNum = 0;
-    wrongNum = 0;
-    finish = "true";
+		number.clear();
+		finish = "true";
+		while (curIndex < playNumArr[playCnt]) {
+			keep = true; // 游戏继续进行
+			int count = duringTime;
+			try {
+				Thread t = new Thread(new Tthread());
+				t.start();
+//				curNum.setText(curIndex+"/10");
+				curIndex += 1;
+				Thread.sleep(100); // 生产下组停顿时间
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			while (keep) {
+				count -= 1;
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if (count < 0)
+					keep = false;
+			}
+		}
 
-    while (curIndex < playNumArr[playCnt]) {
-      keep=true; //游戏继续进行
-      int count=duringTime;
-      try {
-        Thread t = new Thread(new Tthread());
-        t.start();
-        curIndex += 1;
-        Thread.sleep(100); // 生产下组停顿时间
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      while(keep){
-        count-=1;
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        if(count<0)
-          keep=false;
-      }
-    }
+		while (true) { // 等待最后一个字符消失
+			if (number.size() == 0) {
+				break;
+			}
+		}
 
-    while (true) { // 等待最后一个字符消失
-      if (number.size() == 0) {
-        break;
-      }
-    }
-
-    if (rightNum == 0) { // 为了以后相除..如果全部正确或者错误就会出现错误. 所以..
-      rightNum = 1;
-    }
-    if (wrongNum == 0) {
-      wrongNum = 1;
-    }
-
-    if (finish.equals("true")) { // 判断是否是自然结束
-      if (rightNum / wrongNum >= 2) {
-        JOptionPane.showMessageDialog(null, "恭喜你过关了");
-        playCnt += 1; // 自动加1关
-        if (playCnt < playNumArr.length) {
-          if (rapidity > 10) { // 当速度大于10的时候在-5提加速度.怕速度太快
-            rapidity -= 5; // 速度自动减10毫秒
-            jSlider1.setValue(rapidity); // 选择位置
-          }
-          Thread t = new Thread(this);
-          t.start();
-        } else {
-          JOptionPane.showMessageDialog(null, "牛B...你通关了..");
-          playCnt = 0;
-          curIndex = 0;
-        }
-      } else {
-        JOptionPane.showMessageDialog(null, "请再接再励");
-        playCnt = 0;
-        curIndex = 0;
-      }
-    } else {
-      playCnt = 0;
-      curIndex = 0;
-      reset();
-    }
-  }
+		if (finish.equals("true")) { // 判断是否是自然结束
+				playCnt += 1; // 自动加1关
+				duringTime-=2;
+				if (playCnt <= playNumArr.length) {
+					curIndex = 0;
+					Thread t = new Thread(this);
+					t.start();
+				} else {
+					playCnt = 0;
+					curIndex = 0;
+					result2File();
+					dataDao.saveTypingData2DB(data);
+				}
+		} else {
+			playCnt = 0;
+			curIndex = 0;
+			reset();
+		}
+	}
 
   /**
    * 开始新的一局
@@ -263,6 +262,12 @@ public class typingMain extends JFrame implements Runnable {
       reset();
       Thread t = new Thread(this);
       t.start();
+      playCnt=0;
+      curIndex=0;
+      duringTime=10;//间隔为10秒初始化
+	  rightNum=0;
+	  wrongNum=0;
+	  data.removeAllElements();
     }
   }
 
@@ -280,12 +285,14 @@ public class typingMain extends JFrame implements Runnable {
    */
   public void btnStop_actionPerformed(ActionEvent e) {
     if(keep==true) {
-      curIndex = playNumArr[playCnt] + 1;
-      finish = "flase";
-      answerRight = true; //当前答对,tThread线程结束
-      keep = false; //主线程结束一次循环
-      reset();
-    }
+			reset();
+			curIndex = playNumArr[playCnt] + 1;
+			finish = "flase";
+			answerRight = true; // 当前答对,tThread线程结束
+			keep = false; // 主线程结束一次循环
+			result2File();
+			dataDao.saveTypingData2DB(data);
+		}
   }
 
   class Tthread implements Runnable {
@@ -302,6 +309,7 @@ public class typingMain extends JFrame implements Runnable {
       bean.setShow(show);
       number.add(bean);
       int countDown=duringTime;
+      costTime=1;
       while (keep2) {
         lbCountDown.setText("倒计时:"+countDown);
         // ---------------------数字显示--------------------
@@ -312,7 +320,7 @@ public class typingMain extends JFrame implements Runnable {
           e.printStackTrace();
         }
         countDown=countDown-1; //倒计时减一
-
+        costTime=duringTime-countDown;
         if (countDown<0 || answerRight) {  //等待作答时间结束
           keep2 = false;
           answerRight=false;
@@ -323,6 +331,8 @@ public class typingMain extends JFrame implements Runnable {
               resetKey(bean.getShow());
               jLabel2.setText("正确:" + rightNum + "个,错误:" + wrongNum
                 + "个");
+              if(curIndex<playNumArr[playCnt])
+              data.add(new int[]{playCnt,curIndex,0,2,duringTime});
               number.removeElementAt(i);
               Music_fail.play();
               break;
@@ -338,22 +348,42 @@ public class typingMain extends JFrame implements Runnable {
 
   class MyListener extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
+      if(e.getKeyCode()!=16){
       String uu = e.getKeyChar() + "";
       System.out.println(uu);
+      int tempResult=0;
       for (int i = 0; i < number.size(); i++) {
         KeyBean bean = ((KeyBean) number.get(i));
         if (uu.equalsIgnoreCase(bean.getParameter())) {
+          tempResult=1;
           rightNum += 1;
           answerRight=true; //当前答对,tThread线程结束
           keep=false; //主线程结束依次循环
           number.removeElementAt(i);
           resetKey(bean.getShow());
           jLabel2.setText("正确:" + rightNum + "个,错误:" + wrongNum + "个");
+          data.add(new int[]{playCnt,curIndex,1,0,costTime});
           Music_success.play();
           break;
         }
       }
+      if(tempResult==0){
+    	  wrongNum += 1;
+    	  answerRight=true; //当前答对,tThread线程结束
+          keep=false; //主线程结束依次循环
+          jLabel2.setText("正确:" + rightNum + "个,错误:" + wrongNum
+            + "个");
+          data.add(new int[]{playCnt,curIndex,0,1,costTime});
+          Music_fail.play();
+          for (int i = number.size() - 1; i >= 0; i--) {
+            KeyBean bn = ((KeyBean) number.get(i));              
+            resetKey(bn.getShow());
+            number.removeElementAt(i);
+            break;             
+          }
+      }
       Musci_press.play();
+    }
     }
   }
 
@@ -364,7 +394,38 @@ public class typingMain extends JFrame implements Runnable {
     label.setBackground(new Color(48, 47, 55));
   }
 
-
+/**
+ * 保存到文件
+ */
+  public void result2File(){
+		String saveData=System.currentTimeMillis()+"\n";
+		for(int i=0;i<data.size();i++){
+			int a[]=(int[])data.get(i);
+			for(int k=0;k<a.length;k++){
+				saveData+=a[k]+",";
+			}
+			saveData+="\n";
+		}
+		saveData+="\n";
+		FileWriter writer = null;  
+      try {     
+          // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件     
+          writer = new FileWriter("src/typing/result.txt", true);     
+          writer.write(saveData);       
+      } catch (IOException e) {     
+          e.printStackTrace();     
+      } finally {     
+          try {     
+              if(writer != null){  
+                  writer.close();     
+              }  
+          } catch (IOException e) {     
+              e.printStackTrace();     
+          }     
+      }   
+	}
+  
+  
   /**
    *main 函数
    */

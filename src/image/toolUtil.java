@@ -1,5 +1,6 @@
 package image;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class toolUtil {
@@ -17,7 +18,7 @@ public class toolUtil {
 		int scalaY=(int)(blockHeight*1.1);
 		int xMax=(paneWidth-blockWidth)/scaleX; //x数量
 		int yMax=(panelHeight-blockHeight)/scalaY;//y数量
-		System.out.println(xStart+" "+yStart+" "+xMax+" "+yMax);
+//		System.out.println(xStart+" "+yStart+" "+xMax+" "+yMax);
 		LinkedHashSet hashSetX = new LinkedHashSet();
 		LinkedHashSet hashSetY = new LinkedHashSet();
 		while (hashSetX.size()<n){
@@ -49,6 +50,13 @@ public class toolUtil {
 		return location;
 	}
 
+	
+	public static String formatTime(String timeStamp){
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+		String sd = sdf.format(new Date(Long.parseLong(timeStamp)));
+		return sd;  
+	}
+	
 	public static void test(){
 		int paneWidth=600;
 		int panelHeight=400;

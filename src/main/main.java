@@ -6,6 +6,9 @@ import typing.typingMain;
 import voice.voiceMain;
 
 import javax.swing.*;
+
+import analyse.Analyse;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +23,7 @@ public class main extends JFrame{
   JButton btn2=new JButton("图像练习");
   JButton btn3=new JButton("按键练习");
   JButton btn4=new JButton("休闲游戏");
-
+  JButton btn5=new JButton("数据分析");
   public main(){
     try {
       init();
@@ -30,9 +33,10 @@ public class main extends JFrame{
   }
 
   public void init() throws Exception{
+	  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     contentPane = (JPanel) getContentPane();
     contentPane.setLayout(null);
-    setSize(new Dimension(600, 400));
+    setSize(new Dimension(900,450));
     btn1.setBounds(20, 80, 200, 50);
     btn1.setFont(new Font("宋体", Font.PLAIN, 28));
     btn2.setBounds(320, 80, 200, 50);
@@ -41,10 +45,13 @@ public class main extends JFrame{
     btn3.setFont(new Font("宋体", Font.PLAIN, 28));
     btn4.setBounds(320, 260, 200, 50);
     btn4.setFont(new Font("宋体", Font.PLAIN, 28));
+    btn5.setBounds(550, 260, 200, 50);
+    btn5.setFont(new Font("宋体", Font.PLAIN, 28));
     contentPane.add(btn1);
     contentPane.add(btn2);
     contentPane.add(btn3);
     contentPane.add(btn4);
+    contentPane.add(btn5);
 
     btn1.addActionListener(
       new ActionListener() {
@@ -108,24 +115,40 @@ public class main extends JFrame{
     btn4.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-//          KillMouse frame = new KillMouse();
-////          killmouse.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//          Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//          Dimension frameSize = frame.getSize();
-//          if (frameSize.height > screenSize.height) {
-//            frameSize.height = screenSize.height;
-//          }
-//          if (frameSize.width > screenSize.width) {
-//            frameSize.width = screenSize.width;
-//          }
-//          frame.setLocation((screenSize.width - frameSize.width) / 2,
-//            (screenSize.height - frameSize.height) / 2);
-//          frame.setVisible(true);
-          KillMouse killmouse = new KillMouse();
-          killmouse.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        	KillMouse frame = new KillMouse();
+    	  	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	    Dimension frameSize = frame.getSize();
+    	    if (frameSize.height > screenSize.height) {
+    	      frameSize.height = screenSize.height;
+    	    }
+    	    if (frameSize.width > screenSize.width) {
+    	      frameSize.width = screenSize.width;
+    	    }
+    	    frame.setLocation((screenSize.width - frameSize.width) / 2,
+    	      (screenSize.height - frameSize.height) / 2);
+    	    frame.setVisible(true);
         }
       }
     );
+    
+    btn5.addActionListener(
+    	      new ActionListener() {
+    	        public void actionPerformed(ActionEvent e) {
+    	        	Analyse frame = new Analyse();
+    	    	  	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	    	    Dimension frameSize = frame.getSize();
+    	    	    if (frameSize.height > screenSize.height) {
+    	    	      frameSize.height = screenSize.height;
+    	    	    }
+    	    	    if (frameSize.width > screenSize.width) {
+    	    	      frameSize.width = screenSize.width;
+    	    	    }
+    	    	    frame.setLocation((screenSize.width - frameSize.width) / 2,
+    	    	      (screenSize.height - frameSize.height) / 2);
+    	    	    frame.setVisible(true);
+    	        }
+    	      }
+    	    );
 
   }
 
@@ -139,9 +162,11 @@ public class main extends JFrame{
     if (frameSize.width > screenSize.width) {
       frameSize.width = screenSize.width;
     }
+ 
     frame.setLocation((screenSize.width - frameSize.width) / 2,
       (screenSize.height - frameSize.height) / 2);
     frame.setVisible(true);
+ 
   }
 
 }
