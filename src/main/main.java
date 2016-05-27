@@ -3,6 +3,7 @@ package main;
 import game.KillMouse;
 import image.imageMain;
 import typing.typingMain;
+import voice.voiceDetail;
 import voice.voiceMain;
 
 import javax.swing.*;
@@ -56,7 +57,7 @@ public class main extends JFrame{
     btn1.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          voiceMain frame = new voiceMain();
+        	voiceMain frame = new voiceMain();
           Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
           Dimension frameSize = frame.getSize();
           if (frameSize.height > screenSize.height) {

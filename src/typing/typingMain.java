@@ -3,7 +3,7 @@ package typing;
 import game.KillMouse;
 import image.imageMain;
 import typing.typingMain;
-import voice.voiceMain;
+import voice.voiceDetail;
 
 import javax.swing.*;
 
@@ -23,7 +23,7 @@ public class typingMain extends JFrame{
   JButton btn2=new JButton("简单级别");
   JButton btn3=new JButton("中等级别");
   JButton btn4=new JButton("困难级别");
-  JLabel lb=new JLabel("请选择语音训练难度");
+  JLabel lb=new JLabel("请选择图像训练难度");
   BackgroundPanel bgp;
   public typingMain(){
     try {
@@ -38,7 +38,7 @@ public class typingMain extends JFrame{
     contentPane = (JPanel) getContentPane();
     contentPane.setLayout(null);
     setSize(new Dimension(800,400));
-    setTitle("语音训练");
+    setTitle("图像训练II");
     btn1.setBounds(20, 130, 170, 80);
     btn1.setFont(new Font("宋体", Font.PLAIN, 28));
     btn2.setBounds(210, 130, 170, 80);
